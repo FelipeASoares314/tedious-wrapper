@@ -23,24 +23,26 @@ function MSClient(params = {}) {
 MSClient.prototype.createConnection = function () {
   return new Promise((resolve, reject) => {
     let conection = new Connection({ userName: this.userName, password: this.password, server: this.url })
-    
-    conection.on('connect', (err) => {
+
+    let con = {
+      id: uuidv4(),
+      used: true,
+      conn: conection,
+      ready: false
+    }
+
+    pool.push(con)
+    conection.on('connect', err => {
       if (err) {
-        return reject(err)
+        reject(err)
       } else {
-        let con = {
-          id: uuidv4(),
-          used: true,
-          conn: connection,
-          ready: true
-        }
-        pool.push(con)
+        con.ready = true
         resolve(con)
       }
     })
 
     conection.on('end', () => {
-      let index = pool.findIndex(o => o.id == conn.id)
+      let index = pool.findIndex(o => o.id == con.id)
       if (index != -1) {
         pool.splice(index, 1)
       }
@@ -65,53 +67,53 @@ MSClient.prototype.canGetConn = async function(sinceRequestTime = new Date()) {
 MSClient.prototype.getConnection = async function() {
   try {
     await this.canGetConn()
-    let conn = pool.find(o => !o.used)
+    let conn = pool.find(o => !o.used && o.ready)
+
     return conn
-      ? conn
-      : createConnection()
+      ? new Promise(resolve => {
+        conn.used = true
+        resolve(conn)
+      })
+      : this.createConnection()
   } catch(err) {
     throw err
   }
 }
 
-const getRequest = (err) => new Promise((resolve, reject) => {
-  if (err) reject(err)
-  resolve()
-})
-
 MSClient.prototype.query = function(sql, params = []) {
   return new Promise(async (resolve, reject) => {
     try {
       let conn = await this.getConnection()
-      let request = await new Request(sql, getRequest)
-
       let cols = []
-      request.on('row', (columns) => {
-        let row = {}
-        columns.forEach(c => {
-          row[c.metadata.colName] = c.value
-        })
+      let request = await new Request(sql, err => new Promise(() => {
+        if (err) {
+          reject(err)
+        } else {
+          conn.used = false
+          resolve(cols)
+        }
+      }))
 
+      request.on('row', columns => {
+        let row = columns.reduce((acc, atual) => {
+          acc[atual.metadata.colName] = atual.value
+          return acc
+        }, {})
         cols.push(row)
       })
 
       request.on('requestCompleted', () => {
-        conn.conn.reset((err) => {
+        conn.conn.reset(err => {
           if (err) {
-            console.error('Erro ao soltar conexão de id', conn.id)
+            conn.ready = false
             conn.conn.close()
+            reject(err)
           }
-          conn.used = false // release da conexão para o pool
         })
-        resolve(cols)
       })
 
-      request.on('error', (err) => { reject(err) })
-
-      params.map(p => {
-        request.addParameter(p.nome, TYPES[p.type], p.value)
-      })
-
+      request.on('error', (err) => reject(err))
+      params.map(p => request.addParameter(p.name, TYPES[p.type], p.value))
       conn.conn.execSql(request)
     } catch(err) {
       reject(err)

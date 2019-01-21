@@ -1,6 +1,6 @@
 {
   "name": "tedious-wrapper-felipe-as",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Wrapping tedious project so the output of queries look like mysql project.",
   "main": "index.js",
   "scripts": {
