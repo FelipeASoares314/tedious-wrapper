@@ -1,0 +1,27 @@
+{
+  "name": "tedious-wrapper",
+  "version": "1.0.0",
+  "description": "Wrapping tedious project so the output of queries look like mysql project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FelipeASoares314/tedious-wrapper.git"
+  },
+  "keywords": [
+    "nodejs",
+    "mssql",
+    "tedious"
+  ],
+  "author": "Felipe A. Soares",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FelipeASoares314/tedious-wrapper/issues"
+  },
+  "homepage": "https://github.com/FelipeASoares314/tedious-wrapper#readme",
+  "dependencies": {
+    "tedious": "^4.1.3"
+  }
+}
