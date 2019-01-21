@@ -1,5 +1,5 @@
 {
-  "name": "tedious-wrapper",
+  "name": "tedious-wrapper-felipe-as",
   "version": "1.0.0",
   "description": "Wrapping tedious project so the output of queries look like mysql project.",
   "main": "index.js",
