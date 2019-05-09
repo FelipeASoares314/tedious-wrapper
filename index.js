@@ -17,12 +17,13 @@ function MSClient(params = {}) {
   this.queryTimeout = params.timeout || defaults.timeout
   this.userName = params.userName
   this.password = params.password
+  this.database = params.database
   this.url = params.url
 }
 
 MSClient.prototype.createConnection = function () {
   return new Promise((resolve, reject) => {
-    let conection = new Connection({ userName: this.userName, password: this.password, server: this.url })
+    let conection = new Connection({ userName: this.userName, password: this.password, server: this.url, database: this.database })
 
     let con = {
       id: uuidv4(),
