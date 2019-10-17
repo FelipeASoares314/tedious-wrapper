@@ -8,6 +8,11 @@ let pool = []
 const timeout = (time = 100) => new Promise((resolve) => setTimeout(() => resolve(), time))
 
 function MSClient(params = {}) {
+  this.poolSize = params.poolSize || defaults.poolSize
+  this.queryTimeout = params.timeout || defaults.timeout
+  delete params.poolSize
+  delete params.timeout
+  
   this.config = params
 }
 
