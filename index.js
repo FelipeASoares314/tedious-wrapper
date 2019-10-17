@@ -5,14 +5,9 @@ const uuidv4 = require('uuid/v4')
 // Os objs do pool devem ser { id: uuid, used: t/f, conn: connection, ready: t/f }
 let pool = []
 
-const defaults = {
-  poolSize: 10,
-  timeout: 1500
-}
-
 const timeout = (time = 100) => new Promise((resolve) => setTimeout(() => resolve(), time))
 
-function MSClient(params = {}) {
+function MSClient(params) {
   this.config = params
 }
 
