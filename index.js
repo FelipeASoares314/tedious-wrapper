@@ -7,7 +7,7 @@ let pool = []
 
 const timeout = (time = 100) => new Promise((resolve) => setTimeout(() => resolve(), time))
 
-function MSClient(params) {
+function MSClient(params = {}) {
   this.config = params
 }
 
