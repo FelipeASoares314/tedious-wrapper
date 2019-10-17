@@ -13,17 +13,12 @@ const defaults = {
 const timeout = (time = 100) => new Promise((resolve) => setTimeout(() => resolve(), time))
 
 function MSClient(params = {}) {
-  this.poolSize = params.poolSize || defaults.poolSize
-  this.queryTimeout = params.timeout || defaults.timeout
-  this.userName = params.userName
-  this.password = params.password
-  this.database = params.database
-  this.url = params.url
+  this.config = params
 }
 
 MSClient.prototype.createConnection = function () {
   return new Promise((resolve, reject) => {
-    let conection = new Connection({ userName: this.userName, password: this.password, server: this.url, database: this.database })
+    let conection = new Connection(this.config)
 
     let con = {
       id: uuidv4(),
